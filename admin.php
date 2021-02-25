@@ -42,7 +42,60 @@ if($_SESSION['user_role'] !=  1){
             </ul>
         </div>
     </nav>
-    <main></main>
+    <main>
+        
+        <form method='POST'>
+            <label for="pseudo">Pseudo</label>
+            <input type="text" name='pseudo'>
+            <label for="mail">Adresse e-mail</label>
+            <input type="text" name='mail'>
+            <label for="mdp">Mot de passe</label>
+            <input type="text" name='mdp'>
+            <input type="text" name='role' value='0' hidden>
+            <input type="submit" name='submit' value='CREER'>
+        </form>
+        
+    <?php
+        
+        include "connectDB.php";
+
+try{
+
+    $connexion = new PDO(DB_DRIVER . ":host=" . DB_HOST . ";dbname=" . DB_NAME . ";charset=" . DB_CHARSET, DB_LOGIN, DB_PASS, DB_OPTIONS);
+
+    $user_pseudo = htmlspecialchars($_POST['pseudo']);
+    $user_mail = htmlspecialchars($_POST['mail']);
+    $user_mdp = htmlspecialchars($_POST['mdp']);
+    $user_role = htmlspecialchars($_POST['role']);
+    $submit = htmlspecialchars($_POST['submit']);
+
+    if(isset($submit)){
+
+    $requete = "INSERT INTO `user` (`user_pseudo`, `user_mail`, `user_mdp`, `user_role`)
+                VALUES (:user_pseudo, :user_mail, :user_mdp, :user_role);";
+    $prepare = $connexion->prepare($requete);
+    $prepare->execute(array(
+    ":user_pseudo" => $user_pseudo,
+    ":user_mail" => $user_mail,
+    ":user_mdp" => $user_mdp,
+    ":user_role" => $user_role
+    ));
+    $resultat = $prepare->rowCount();
+
+    if($resultat == 1){
+        echo "Le nouveau compte " . $user_pseudo . " a bien été créé.";
+    } else{
+        echo "Une erreur s'est produite. Le nouveau compte " . $user_pseudo . " n'a pas pu être créé.";
+    }
+    }
+
+} catch (PDOException $e) {
+    exit("🚫" . $e->getMessage());
+
+}
+        ?>
+        
+    </main>
     <script src="src/js/app.js"></script>
 </body>
 </html>
